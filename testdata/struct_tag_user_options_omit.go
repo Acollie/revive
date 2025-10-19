@@ -39,9 +39,9 @@ type ValidateUser struct {
 	Biography   string `validate:"min=0,max=1000"`
 	DisplayName string `validate:"displayName,min=3,max=32"`
 	Complex     string `validate:"gt=0,dive,keys,eq=1|eq=2,endkeys,required"`
-	BadComplex  string `validate:"gt=0,keys,eq=1|eq=2,endkeys,required"`              // MATCH /option "keys" must follow a "dive" option in validate tag/
-	BadComplex2 string `validate:"gt=0,dive,eq=1|eq=2,endkeys,required"`              // MATCH /option "endkeys" without a previous "keys" option in validate tag/
-	BadComplex3 string `validate:"gt=0,dive,keys,eq=1|eq=2,endkeys,endkeys,required"` // MATCH /option "endkeys" without a previous "keys" option in validate tag/
+	BadComplex  string `validate:"gt=0,keys,eq=1|eq=2,endkeys,required"`
+	BadComplex2 string `validate:"gt=0,dive,eq=1|eq=2,endkeys,required"`
+	BadComplex3 string `validate:"gt=0,dive,keys,eq=1|eq=2,endkeys,endkeys,required"`
 }
 
 type TomlUser struct {
@@ -75,8 +75,8 @@ type uselessOptions struct {
 	Q  int       `spanner:"-,mySpannerOption"`                 // MATCH /useless option mySpannerOption for ignored field in spanner tag/
 	R  int       `spanner:"-,mySpannerOption,mySpannerOption"` // MATCH /useless options mySpannerOption,mySpannerOption for ignored field in spanner tag/
 	S  int       `toml:"-,"`
-	T  int       `toml:"-,omitempty"`           // MATCH /useless option omitempty for ignored field in toml tag/
-	U  int       `toml:"-,omitempty,omitempty"` // MATCH /useless options omitempty,omitempty for ignored field in toml tag/
+	T  int       `toml:"-,omitempty"`
+	U  int       `toml:"-,omitempty,omitempty"`
 	V  int       `url:"-,"`
 	W  int       `url:"-,omitempty"`           // MATCH /useless option omitempty for ignored field in url tag/
 	X  int       `url:"-,omitempty,omitempty"` // MATCH /useless options omitempty,omitempty for ignored field in url tag/
@@ -92,21 +92,7 @@ type uselessOptions struct {
 	// MATCH:68 /unknown option "" in mapstructure tag/
 	// MATCH:71 /unknown or malformed option "" in properties tag/
 	// MATCH:74 /unknown option "" in spanner tag/
-	// MATCH:77 /unknown option "" in toml tag/
 	// MATCH:80 /unknown option "" in url tag/
 	// MATCH:83 /unknown option "" in xml tag/
 	// MATCH:86 /unknown option "" in yaml tag/
-}
-
-type CodecUserOptions struct {
-	ID   int    `codec:"user_id,myCodecOption"`
-	Name string `codec:"full_name,unknownOption"` // MATCH /unknown option "unknownOption" in codec tag/
-}
-
-type CborUserOptions struct {
-	InputsOk   string `cbor:"8,keyasint,myCborOption"`
-	OutputsOk  string `cbor:"-100,keyasint,unknownOption"` // MATCH /unknown option "unknownOption" in cbor tag/
-	ErrorsOk   string `cbor:"-1,keyasint"`
-	InputsOk2  string `cbor:"inputs,omitempty"`
-	OutputsOk2 string `cbor:",toarray"`
 }

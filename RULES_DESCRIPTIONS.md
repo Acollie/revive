@@ -42,6 +42,7 @@ List of all available rules.
 - [file-length-limit](#file-length-limit)
 - [filename-format](#filename-format)
 - [flag-parameter](#flag-parameter)
+- [forbidden-call-in-wg-go](#forbidden-call-in-wg-go)
 - [function-length](#function-length)
 - [function-result-limit](#function-result-limit)
 - [get-return](#get-return)
@@ -86,6 +87,7 @@ List of all available rules.
 - [unexported-naming](#unexported-naming)
 - [unexported-return](#unexported-return)
 - [unhandled-error](#unhandled-error)
+- [unnecessary-if](#unnecessary-if)
 - [unnecessary-format](#unnecessary-format)
 - [unnecessary-stmt](#unnecessary-stmt)
 - [unreachable-code](#unreachable-code)
@@ -117,7 +119,7 @@ _Configuration_:
 - `allowFloats` (`allowfloats`, `allow-floats`): (string) comma-separated list of allowed floats
 - `ignoreFuncs` (`ignorefuncs`, `ignore-funcs`): (string) comma-separated list of function names regexp patterns to exclude
 
-Examples:
+Configuration examples:
 
 ```toml
 [rule.add-constant]
@@ -140,7 +142,7 @@ Enforcing a maximum number of parameters helps to keep the code readable and mai
 
 _Configuration_: (int) the maximum number of parameters allowed per function.
 
-Example:
+Configuration example:
 
 ```toml
 [rule.argument-limit]
@@ -159,7 +161,7 @@ _Description_: Checks given banned characters in identifiers(func, var, const). 
 
 _Configuration_: This rule requires a slice of strings, the characters to ban.
 
-Example:
+Configuration example:
 
 ```toml
 [rule.banned-characters]
@@ -183,6 +185,32 @@ _Configuration_: N/A
 _Description_: Using Boolean literals (`true`, `false`) in logic expressions may make the code less readable.
 This rule suggests removing Boolean literals from logic expressions.
 
+### Examples (bool-literal-in-expr)
+
+Before (violation):
+
+```go
+if attachRequired == true {
+  // do something
+}
+
+if mustReply == false {
+  // do something
+}
+```
+
+After (fixed):
+
+```go
+if attachRequired {
+  // do something
+}
+
+if !mustReply {
+  // do something
+}
+```
+
 _Configuration_: N/A
 
 ## call-to-gc
@@ -202,7 +230,7 @@ Enforcing a maximum complexity per function helps to keep code readable and main
 
 _Configuration_: (int) the maximum function complexity
 
-Example:
+Configuration example:
 
 ```toml
 [rule.cognitive-complexity]
@@ -226,7 +254,7 @@ _Configuration_: ([]string) list of exceptions. For example, to accept comments 
 
 You need to add both `"mypragma:"` and `"+optional"` in the configuration
 
-Example:
+Configuration example:
 
 ```toml
 [rule.comment-spacings]
@@ -240,7 +268,7 @@ metric = _comment lines / (lines of code + comment lines) * 100_
 
 _Configuration_: (int) the minimum expected comments lines density.
 
-Example:
+Configuration example:
 
 ```toml
 [rule.comments-density]
@@ -256,6 +284,22 @@ _Configuration_: N/A
 ## confusing-results
 
 _Description_: Function or methods that return multiple, no named, values of the same type could induce error.
+
+### Examples (confusing-results)
+
+Before (violation):
+
+```go
+// getPos yields the geographical position of this tag.
+func (t tag) getPos() (float32, float32)
+```
+
+After (fixed):
+
+```go
+// getPos yields the geographical position of this tag.
+func (t tag) getPos() (longitude float32, latitude float32)
+```
 
 _Configuration_: N/A
 
@@ -274,7 +318,7 @@ _Configuration_:
 
 - `allowTypesBefore` (`allowtypesbefore`, `allow-types-before`): (string) comma-separated list of types that may be before 'context.Context'
 
-Examples:
+Configuration examples:
 
 ```toml
 [rule.context-as-argument]
@@ -303,7 +347,7 @@ Enforcing a maximum complexity per function helps to keep code readable and main
 
 _Configuration_: (int) the maximum function complexity
 
-Example:
+Configuration example:
 
 ```toml
 [rule.cyclomatic]
@@ -347,7 +391,7 @@ These gotchas are [described here](https://blog.learngoprogramming.com/gotchas-o
 _Configuration_: By default, all warnings are enabled but it is possible selectively enable them through configuration.
 For example to enable only `call-chain` and `loop`:
 
-Examples:
+Configuration examples:
 
 ```toml
 [rule.defer]
@@ -370,7 +414,7 @@ _Configuration_:
 
 - `allowedPackages` (`allowedpackages`, `allowed-packages`): (list of strings) comma-separated list of allowed dot import packages
 
-Examples:
+Configuration examples:
 
 ```toml
 [rule.dot-imports]
@@ -429,7 +473,7 @@ _Configuration_: ([]string) rule flags. Available flags are:
 - `allowJump` (`allowjump`, `allow-jump`): suggest a new jump (`return`, `continue` or `break` statement) if it could unnest multiple statements.
 By default, only relocation of _existing_ jumps (i.e. from the `else` clause) are suggested.
 
-Examples:
+Configuration examples:
 
 ```toml
 [rule.early-return]
@@ -465,7 +509,7 @@ _Configuration_: (string) Specifies the enforced style for map initialization. T
 - "make": Enforces the usage of `make(map[type]type)`.
 - "literal": Enforces the usage of `map[type]type{}`.
 
-Example:
+Configuration example:
 
 ```toml
 [rule.enforce-map-style]
@@ -526,7 +570,7 @@ _Configuration_: (string) Specifies the enforced style for slice initialization.
 - "literal": Enforces the usage of `[]type{}`.
 - "nil": Enforces the usage of `var []type`.
 
-Example:
+Configuration example:
 
 ```toml
 [rule.enforce-slice-style]
@@ -543,7 +587,7 @@ _Configuration_: ([]string) Specifies what to enforced: occurrence and/or positi
 - "allowNoDefault": allows `switch` without `default` case clause.
 - "allowDefaultNotLast": allows `default` case clause to be not the last clause of the `switch`.
 
-Examples:
+Configuration examples:
 
 To enforce that all `switch` statements have a `default` clause as its the last case clause:
 
@@ -590,7 +634,7 @@ More [information here](https://go.dev/wiki/CodeReviewComments#error-strings).
 _Configuration_: ([]string) the list of additional error functions to check.
 The format of values is `package.FunctionName`.
 
-Example:
+Configuration example:
 
 ```toml
 [rule.error-strings]
@@ -626,7 +670,7 @@ by _repetitive_ in failure messages
 - `disableChecksOnTypes` (`disablechecksontypes`, `disable-checks-on-types`) disable all checks on type declarations
 - `disableChecksOnVariables` (`disablechecksonvariables`, `disable-checks-on-variables`) disable all checks on variable declarations
 
-Examples:
+Configuration examples:
 
 ```toml
 [rule.exported]
@@ -654,7 +698,7 @@ _Description_: This rule helps to enforce a common header for all source files i
 
 _Configuration_: (string) the header to look for in source files.
 
-Example:
+Configuration example:
 
 ```toml
 [rule.file-header]
@@ -671,7 +715,7 @@ _Configuration_:
 - `skipComments` (`skipcomments`, `skip-comments`): (bool) if true ignore and do not count lines containing just comments (default `false`);
 - `skipBlankLines` (`skipblanklines`, `skip-blank-lines`): (bool) if true ignore and do not count lines made up purely of whitespace (default `false`).
 
-Examples:
+Configuration examples:
 
 ```toml
 [rule.file-length-limit]
@@ -690,7 +734,7 @@ Optionally, the rule can be configured to enforce other forms.
 
 _Configuration_: (string) regular expression for source filenames.
 
-Example:
+Configuration example:
 
 ```toml
 [rule.filename-format]
@@ -705,13 +749,68 @@ This rule warns on boolean parameters that create a control coupling.
 
 _Configuration_: N/A
 
+## forbidden-call-in-wg-go
+
+_Description_: Since Go 1.25, it is possible to create goroutines with the method `waitgroup.Go`.
+The `Go` method calls a function in a new goroutine and adds (`Add`) that task to the WaitGroup.
+When the function returns, the task is removed (`Done`) from the WaitGroup.
+
+This rule ensures that functions don't panic as is specified
+in the [documentation of `WaitGroup.Go`](https://pkg.go.dev/sync#WaitGroup.Go).
+
+The rule also warns against a common mistake when refactoring legacy code:
+accidentally leaving behind a call to `WaitGroup.Done`, which can cause subtle bugs or panics.
+
+### Examples (forbidden-call-in-wg-go)
+
+Legacy code with a call to `wg.Done`:
+
+```go
+wg := sync.WaitGroup{}
+
+wg.Add(1)
+go func() {
+  doSomething()
+  wg.Done()
+}()
+
+wg.Wait
+```
+
+Refactored, incorrect, code:
+
+```go
+wg := sync.WaitGroup{}
+
+wg.Go(func() {
+  doSomething()
+  wg.Done()
+})
+
+wg.Wait
+```
+
+Fixed code:
+
+```go
+wg := sync.WaitGroup{}
+
+wg.Go(func() {
+  doSomething()
+})
+
+wg.Wait
+```
+
+_Configuration_: N/A
+
 ## function-length
 
 _Description_: Functions too long (with many statements and/or lines) can be hard to understand.
 
 _Configuration_: (int,int) the maximum allowed statements and lines. Must be non-negative integers. Set to 0 to disable the check
 
-Example:
+Configuration example:
 
 ```toml
 [rule.function-length]
@@ -726,7 +825,7 @@ _Description_: Functions returning too many results can be hard to understand/us
 
 _Configuration_: (int) the maximum allowed return values
 
-Example:
+Configuration example:
 
 ```toml
 [rule.function-result-limit]
@@ -796,14 +895,14 @@ _Note_: If both `allowRegex` and `denyRegex` are provided, the alias must comply
 If none are given (i.e. an empty map), the default value `^[a-z][a-z0-9]{0,}$` for allowRegex is used.
 Unknown keys will result in an error.
 
-Example (1):
+Configuration example (1):
 
 ```toml
 [rule.import-alias-naming]
 arguments = ["^[a-z][a-z0-9]{0,}$"]
 ```
 
-Examples (2):
+Configuration examples (2):
 
 ```toml
 [rule.import-alias-naming]
@@ -829,7 +928,7 @@ _Description_: Warns when importing block-listed packages.
 
 _Configuration_: block-list of package names (or regular expression package names).
 
-Example:
+Configuration example:
 
 ```toml
 [rule.imports-blocklist]
@@ -854,7 +953,7 @@ _Configuration_: ([]string) rule flags. Available flags are:
 
 - `preserveScope` (`preservescope`, `preserve-scope`): do not suggest refactorings that would increase variable scope
 
-Examples:
+Configuration examples:
 
 ```toml
 [rule.indent-error-flow]
@@ -889,7 +988,7 @@ and then a loop over `elements` is changed in an obvious but inefficient way:
         }
 ```
 
-Example:
+Configuration example:
 
 ```go
 aMap := map[string]bool{}{}
@@ -916,7 +1015,7 @@ _Description_: Warns in the presence of code lines longer than a configured maxi
 
 _Configuration_: (int) maximum line length in characters.
 
-Example:
+Configuration example:
 
 ```toml
 [rule.line-length-limit]
@@ -929,7 +1028,7 @@ _Description_: Warns if nesting level of control structures (`if-then-else`, `fo
 
 _Configuration_: (int) maximum accepted nesting level of control structures (defaults to 5)
 
-Example:
+Configuration example:
 
 ```toml
 [rule.max-control-nesting]
@@ -945,7 +1044,7 @@ This rule warns on files declaring more than a configured, maximum number of pub
 
 _Configuration_: (int) the maximum allowed public structs
 
-Example:
+Configuration example:
 
 ```toml
 [rule.max-public-structs]
@@ -1025,7 +1124,7 @@ For files in version directories (`v1`, `v2`, etc.), package name is checked if 
 
 _Configuration_: Named arguments for directory exclusions.
 
-Examples:
+Configuration examples:
 
 Default behavior excludes paths containing `testdata`
 
@@ -1082,7 +1181,7 @@ _Configuration_: (optional) list of key-value-pair-map (`[]map[string]any`).
 
 - `maxLength` (`maxlength`, `max-length`): (int) max length of receiver name
 
-Examples:
+Configuration examples:
 
 ```toml
 [rule.receiver-naming]
@@ -1149,7 +1248,7 @@ If you need to inverse the semantics you can add a `!` just before the first `/`
 
 3. The third string (optional) is a **message** containing the purpose for the regex, which will be used in lint errors.
 
-Example:
+Configuration example:
 
 ```toml
 [rule.string-format]
@@ -1186,18 +1285,48 @@ _Configuration_: N/A
 
 ## struct-tag
 
-_Description_: Struct tags are not checked at compile time.
-This rule spots errors in struct tags of the following types:
-asn1, bson, datastore, default, json, mapstructure, properties, protobuf, required, spanner, toml, url, validate, xml, yaml.
+_Description_: The rule spots errors in struct tags.
+This is useful because struct tags are not checked at compile time.
 
-_Configuration_: (optional) list of user defined options.
+The list of [supported tags](https://go.dev/wiki/Well-known-struct-tags):
 
-Example:
+| Tag           | Documentation                                                            |
+| ------------- | ------------------------------------------------------------------------ |
+| `asn1`         | <https://pkg.go.dev/encoding/asn1>                                      |
+| `bson`         | <https://pkg.go.dev/go.mongodb.org/mongo-driver/bson>                   |
+| `cbor`         | <https://pkg.go.dev/github.com/fxamacker/cbor/v2>                   |
+| `datastore`    | <https://pkg.go.dev/cloud.google.com/go/datastore>                      |
+| `default`      | The type of "default" must match the type of the field.                 |
+| `json`         | <https://pkg.go.dev/encoding/json>                                      |
+| `mapstructure` | <https://pkg.go.dev/github.com/mitchellh/mapstructure>                  |
+| `properties`   | <https://pkg.go.dev/github.com/magiconair/properties#Properties.Decode> |
+| `protobuf`     | <https://github.com/golang/protobuf>                                    |
+| `required`     | Should be only "true" or "false".                                       |
+| `spanner`      | <https://pkg.go.dev/cloud.google.com/go/spanner>                        |
+| `toml`         | <https://pkg.go.dev/github.com/pelletier/go-toml/v2>                    |
+| `url`          | <https://github.com/google/go-querystring>                              |
+| `validate`     | <https://github.com/go-playground/validator>                            |
+| `xml`          | <https://pkg.go.dev/encoding/xml>                                       |
+| `yaml`         | <https://pkg.go.dev/gopkg.in/yaml.v2>                                   |
+
+_Configuration_: (optional) The list of struct tags that can be accepted by the rule additionally to the supported tags.
+
+Configuration example:
+
 To accept the `inline` option in JSON tags (and `outline` and `gnu` in BSON tags) you must provide the following configuration
 
 ```toml
 [rule.struct-tag]
 arguments = ["json,inline", "bson,outline,gnu"]
+```
+
+To prevent a tag from being checked, simply add a `!` before its name.
+For example, to instruct the rule not to check `validate` tags
+(and accept `outline` and `gnu` in BSON tags) you can provide the following configuration
+
+```toml
+[rule.struct-tag]
+arguments = ["!validate", "bson,outline,gnu"]
 ```
 
 ## superfluous-else
@@ -1209,7 +1338,7 @@ _Configuration_: ([]string) rule flags. Available flags are:
 
 - `preserveScope` (`preservescope`, `preserve-scope`): (string) do not suggest refactorings that would increase variable scope
 
-Examples:
+Configuration examples:
 
 ```toml
 [rule.superfluous-else]
@@ -1322,7 +1451,7 @@ foo, _ := bar(.*Baz).
 //   ^
 ```
 
-Examples:
+Configuration examples:
 
 ```toml
 [rule.unchecked-type-assertion]
@@ -1359,7 +1488,7 @@ _Description_: This rule warns when errors returned by a function are not explic
 
 _Configuration_: function names regexp patterns to ignore
 
-Example:
+Configuration example:
 
 ```toml
 [rule.unhandled-error]
@@ -1371,6 +1500,39 @@ arguments = [
   '^(bytes\.Buffer|string\.Writer)\.Write(Byte|Rune|String)?$',
 ]
 ```
+
+## unnecessary-if
+
+_Description_: Detects unnecessary `if-else` statements that return or assign a boolean value
+based on a condition and suggests a simplified, direct return or assignment.
+The `if-else` block is redundant because the condition itself is already a boolean expression.
+The simplified version is immediately clearer, more idiomatic, and reduces cognitive load for the reader.
+
+### Examples (unnecessary-if)
+
+```go
+if y <= 0 {
+  z = true
+} else {
+  z = false
+}
+
+if x > 10 {
+  return false
+} else {
+  return true
+}
+```
+
+Fixed code:
+
+```go
+z = y <= 0
+
+return x <= 10
+```
+
+_Configuration_: N/A
 
 ## unnecessary-format
 
@@ -1409,7 +1571,7 @@ _Description_: This rule warns on unused parameters. Functions or methods with u
 _Configuration_: Supports arguments with single of `map[string]any` with option `allowRegex` (`allowregex`, `allow-regex`) to provide additional
 to `_` mask to allowed unused parameter names.
 
-Examples:
+Configuration examples:
 
 This allows any names starting with `_`, not just `_` itself:
 
@@ -1434,7 +1596,7 @@ _Description_: This rule warns on unused method receivers. Methods with unused r
 _Configuration_:
 Supports arguments with single of `map[string]any` with option `allowRegex` to provide additional to `_` mask to allowed unused receiver names.
 
-Examples:
+Configuration examples:
 
 This allows any names starting with `_`, not just `_` itself:
 
@@ -1560,10 +1722,14 @@ When `skipPackageNameChecks` is false (the default), you can configure
 to forbid using the values from the list as package names additionally
 to the standard meaningless ones: "common", "interfaces", "misc",
 "types", "util", "utils".
+When `skipPackageNameCollisionWithGoStd`
+(`skippackagenamecollisionwithgostd`, `skip-package-name-collision-with-go-std`)
+is set to true, the rule disables checks on package names that collide
+with Go standard library packages.
 
 By default, the rule behaves exactly as the alternative in `golint` but optionally, you can relax it (see [golint/lint/issues/89](https://github.com/golang/lint/issues/89)).
 
-Examples:
+Configuration examples:
 
 ```toml
 [rule.var-naming]
@@ -1603,6 +1769,11 @@ arguments = [[], [], [{ skip-package-name-checks = true }]]
 ```toml
 [rule.var-naming]
 arguments = [[], [], [{ extra-bad-package-names = ["helpers", "models"] }]]
+```
+
+```toml
+[rule.var-naming]
+arguments = [[], [], [{ skip-package-name-collision-with-go-std = true }]]
 ```
 
 ## waitgroup-by-value
